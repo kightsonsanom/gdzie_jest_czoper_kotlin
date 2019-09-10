@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <com.savvi.rangedatepicker.CalendarPickerView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/calendar_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:scrollbarStyle="outsideOverlay"
+            android:clipToPadding="false"
+            app:tsquare_orientation_horizontal="false"
+            app:tsquare_dividerColor="@color/transparent"
+            app:tsquare_headerTextColor="@color/custom_header_text"
+            android:layout_weight="1"
+            />
+
+    <Button
+            android:id="@+id/accept_dates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_style"
+            android:layout_margin="5dp"
+            android:text="Zatwierdź"
+            android:enabled="false"
+            />
+
+</LinearLayout>
