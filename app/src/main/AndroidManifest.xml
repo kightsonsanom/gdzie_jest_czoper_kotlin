@@ -30,6 +30,7 @@
         </activity>
 
         <service android:name=".services.LocationUpdatesService"/>
+        <service android:name="com.example.asinit_user.gdziejestczoper.services.GeocodeAddressIntentService"/>
     </application>
 
 </manifest>

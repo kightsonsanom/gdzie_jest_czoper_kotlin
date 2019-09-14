@@ -29,8 +29,6 @@ class NavigationActivity : DaggerAppCompatActivity() {
     @Inject
     lateinit var sharedPreferencesRepository: SharedPreferencesRepository
 
-
-
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_home -> {

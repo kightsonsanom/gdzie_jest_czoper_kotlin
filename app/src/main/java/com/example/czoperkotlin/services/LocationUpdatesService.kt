@@ -14,7 +14,6 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.czoperkotlin.R
-import com.example.czoperkotlin.db.Repository
 import com.example.czoperkotlin.ui.NavigationActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -43,9 +42,6 @@ class LocationUpdatesService : DaggerService() {
     private lateinit var notificationManager: NotificationManager
     private lateinit var notificationChannel: NotificationChannel
     private lateinit var locationRequest: LocationRequest
-
-    @Inject
-    lateinit var repository: Repository
 
     @Inject
     lateinit var locationHelper: LocationServiceHelper
@@ -87,8 +83,9 @@ class LocationUpdatesService : DaggerService() {
     private fun onNewLocation(newLocation: Location?) {
         location = newLocation!!
 
+        locationHelper.startProcessingLocation(newLocation)
         Log.d("TAG", "location arrived")
-        if (!isServiceRunningInForeground()) {
+        if (!locationHelper.isServiceRunningInForeground()) {
             notificationManager.notify(NOTIFICATION_ID, getNotification())
         }
     }
@@ -153,10 +150,6 @@ class LocationUpdatesService : DaggerService() {
         }
 
         return builder.build()
-    }
-
-    private fun isServiceRunningInForeground(): Boolean {
-        return repository.isLocationSerivceRunning()
     }
 
     fun requestLocationUpdates() {
