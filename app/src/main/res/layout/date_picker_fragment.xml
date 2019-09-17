@@ -25,7 +25,7 @@
             android:id="@+id/accept_dates"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_style"
+            android:background="@drawable/button_drawable"
             android:layout_margin="5dp"
             android:text="Zatwierdź"
             android:enabled="false"

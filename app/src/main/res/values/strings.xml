@@ -7,7 +7,7 @@
     <string name="map_fragment_tag">MapFragmentTag</string>
     <string name="search_fragment_tag">MapFragmentTag</string>
     <string name="choose_date_button">Wybierz datę</string>
-    <string name="preferences_file_key">com.example.czoperkotlin.ui.PREFERENCE_FILE_KEY</string>
+    <string name="preferences_file_key">pl.tolichwer.czoperkotlin.ui.PREFERENCE_FILE_KEY</string>
     <string name="action_sign_in">Zaloguj się</string>
     <string name="prompt_username">Podaj nazwę użytkownika</string>
     <string name="prompt_password">Podaj hasło</string>
@@ -17,4 +17,7 @@
     <string name="location_update_text">Lokalizacja ustalona za pomocą Czopera</string>
     <string name="location_update_title">Nowa lokalizacja</string>
     <string name="launch_activity">Przejdź do aplikacji</string>
+    <string name="internet_connection_required">Wymagane połączenie sieciowe</string>
+    <string name="password_validation_error">Hasło zbyt krótkie</string>
+    <string name="username_validation_error">Nazwa użytkownika zbyt krótka</string>
 </resources>
