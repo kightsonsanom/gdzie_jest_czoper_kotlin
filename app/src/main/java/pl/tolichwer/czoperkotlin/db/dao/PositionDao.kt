@@ -14,7 +14,7 @@ interface PositionDao{
     fun insertAll(positionList: List<Position>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPosition(position: Position)
+    fun insertPosition(position: Position): Single<Long>
 
     @Query("SELECT * FROM position WHERE position.userID= :userID ORDER BY lastLocationDate DESC LIMIT 1")
     fun getLatestPositionFromDB(userID: Int): Single<Position>

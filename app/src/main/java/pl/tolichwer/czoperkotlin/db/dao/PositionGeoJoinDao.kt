@@ -12,7 +12,7 @@ import pl.tolichwer.czoperkotlin.model.PositionGeoJoin
 interface PositionGeoJoinDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(positionGeoJoin: PositionGeoJoin)
+    fun insert(positionGeoJoin: PositionGeoJoin): Single<Long>
 
     // @Query(
     //     "SELECT * FROM geo " +

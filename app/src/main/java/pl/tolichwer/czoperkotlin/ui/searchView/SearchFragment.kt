@@ -44,7 +44,7 @@ class SearchFragment : DaggerFragment(), SearchFragmentViewModelCallback {
     }
 
     private fun setOnClickListeners() {
-        binding.chooseDateButton.setOnClickListener {
+        binding.btnChooseDate.setOnClickListener {
             val datePickerFragment = DatePickerFragment.newInstance("Tytul")
             datePickerFragment.setDatePickerCallback(this)
             datePickerFragment.show(activity!!.supportFragmentManager, "dialogFragment")
@@ -60,7 +60,7 @@ class SearchFragment : DaggerFragment(), SearchFragmentViewModelCallback {
             "${parseDate(dates[0])} - ${parseDate(dates[dates.size-1])}"
         }
 
-        binding.chooseDateButton.text = dateText
+        binding.btnChooseDate.text = dateText
 
     }
 

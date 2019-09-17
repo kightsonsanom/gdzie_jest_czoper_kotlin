@@ -111,11 +111,19 @@ class Repository @Inject constructor(
 
     fun assignGeoToPosition(positionGeoJoin: PositionGeoJoin) {
         positionGeoJoinDao.insert(positionGeoJoin)
+            // .subscribeOn(Schedulers.io())
+            // .observeOn(Schedulers.io())
+            // .subscribeBy (
+            //     onError = {},
+            //     onSuccess = {}
+            // )
     }
 
     fun sendGeoAndPosition(newGeo: Geo, newPosition: Position) {
         geoDao.insertGeo(newGeo)
         positionDao.insertPosition(newPosition)
+
+
 
 
         czoperApi.sendGeo(newGeo.userID, newGeo)

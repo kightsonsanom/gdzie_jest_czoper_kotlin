@@ -7,7 +7,6 @@ import android.location.Geocoder
 import android.location.Location
 import android.util.Log
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import pl.tolichwer.czoperkotlin.R
@@ -42,7 +41,7 @@ class LocationServiceHelper @Inject constructor(
 
         getLocationAddress(newLocation)
             .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(Schedulers.io())
             .subscribeBy(
                 onError = {
                     address = context.getString(R.string.internet_connection_required)

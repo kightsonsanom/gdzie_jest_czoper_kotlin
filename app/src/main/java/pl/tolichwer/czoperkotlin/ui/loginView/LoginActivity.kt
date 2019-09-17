@@ -35,7 +35,7 @@ class LoginActivity : DaggerAppCompatActivity() {
             })
 
         binding = DataBindingUtil.setContentView(this, R.layout.login_activity)
-        binding.loginButton.setOnClickListener {
+        binding.btnLogin.setOnClickListener {
             attemptLogin()
         }
     }

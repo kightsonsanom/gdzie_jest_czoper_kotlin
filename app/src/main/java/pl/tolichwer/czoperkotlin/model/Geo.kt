@@ -6,12 +6,13 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import pl.tolichwer.czoperkotlin.util.Constants
+import java.util.UUID
 
 @Entity(tableName = "geo")
 data class Geo(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @NonNull
-    val id: Long,
+    val id: Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE,
     val location: Location,
     val date: Long,
     val displayText: String,
@@ -20,7 +21,7 @@ data class Geo(
 
     @Ignore
     constructor(location: Location, userID: Int): this(
-        id = 0,
+        id = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE,
         location = location,
         date = System.currentTimeMillis(),
         displayText = "Date = ${Constants.longToString(System.currentTimeMillis())}",

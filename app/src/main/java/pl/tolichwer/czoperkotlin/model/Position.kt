@@ -4,12 +4,13 @@ import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import java.util.UUID
 
 @Entity(tableName = "position")
 data class Position(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @NonNull
-    val id: Long,
+    val id: Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE,
     var startDate: String,
     var endDate: String,
     var lastLocationDate: Long,
@@ -22,7 +23,7 @@ data class Position(
 
     @Ignore
     constructor(userID: Int) : this(
-        id = 0,
+        id = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE,
         startDate = "",
         endDate = "",
         lastLocationDate = 0,
