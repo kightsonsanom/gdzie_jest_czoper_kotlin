@@ -19,8 +19,6 @@ class SearchFragment : DaggerFragment(), SearchFragmentViewModelCallback {
     private lateinit var binding: SearchFragmentBinding
     private lateinit var userSpinner: Spinner
 
-    val mockUserList = mutableListOf("Tomek", "Marek", "Pawel")
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.search_fragment, container, false)
 
@@ -38,8 +36,6 @@ class SearchFragment : DaggerFragment(), SearchFragmentViewModelCallback {
 
     private fun initUserSpinner() {
         val userNamesAdapter = ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1)
-        userNamesAdapter.addAll(mockUserList)
-
         userSpinner.adapter = userNamesAdapter
     }
 
@@ -54,17 +50,16 @@ class SearchFragment : DaggerFragment(), SearchFragmentViewModelCallback {
 
     override fun setDate(dates: List<Date>) {
 
-        val dateText = if (dates.size ==1) {
+        val dateText = if (dates.size == 1) {
             parseDate(dates[0])
         } else {
-            "${parseDate(dates[0])} - ${parseDate(dates[dates.size-1])}"
+            "${parseDate(dates[0])} - ${parseDate(dates[dates.size - 1])}"
         }
 
         binding.btnChooseDate.text = dateText
-
     }
 
-    private fun parseDate(date: Date): String{
+    private fun parseDate(date: Date): String {
         val oldDateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
         val newDateFormat = SimpleDateFormat("d MMM", Locale.getDefault())
 
@@ -72,5 +67,4 @@ class SearchFragment : DaggerFragment(), SearchFragmentViewModelCallback {
 
         return newDateFormat.format(oldDateParse)
     }
-
 }

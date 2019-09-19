@@ -21,22 +21,22 @@ class PositionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         when (holder.itemViewType) {
             0 -> {
                 val moveViewHolder = holder as MoveItemViewHolder
-                moveViewHolder.binding.setPosition(positionList[position])
+                moveViewHolder.binding.position = positionList[position]
                 moveViewHolder.binding.executePendingBindings()
             }
             1 -> {
                 val postojViewHolder = holder as StopItemViewHolder
-                postojViewHolder.binding.setPosition(positionList[position])
+                postojViewHolder.binding.position = positionList[position]
                 postojViewHolder.binding.executePendingBindings()
             }
             2 -> {
                 val nieznanyVieHolder = holder as UnknownItemVieHolder
-                nieznanyVieHolder.binding.setPosition(positionList[position])
+                nieznanyVieHolder.binding.position = positionList[position]
                 nieznanyVieHolder.binding.executePendingBindings()
             }
             3 -> {
                 val przerwaViewHolder = holder as PauseItemViewHolder
-                przerwaViewHolder.binding.setPosition(positionList[position])
+                przerwaViewHolder.binding.position = positionList[position]
                 przerwaViewHolder.binding.executePendingBindings()
             }
         }
@@ -77,12 +77,10 @@ class PositionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-
     fun setPositionsList(positionList: List<Position>) {
         if (this.positionList.isEmpty()) {
             this.positionList = positionList
             notifyItemRangeInserted(0, positionList.size)
-
         } else {
             val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
                 override fun getOldListSize(): Int {

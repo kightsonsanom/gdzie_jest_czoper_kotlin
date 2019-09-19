@@ -13,7 +13,6 @@ import pl.tolichwer.czoperkotlin.R
 import pl.tolichwer.czoperkotlin.db.Repository
 import pl.tolichwer.czoperkotlin.model.Geo
 import pl.tolichwer.czoperkotlin.model.Position
-import pl.tolichwer.czoperkotlin.model.PositionGeoJoin
 import pl.tolichwer.czoperkotlin.util.Constants
 import java.io.IOException
 import javax.inject.Inject
@@ -100,38 +99,36 @@ class LocationServiceHelper @Inject constructor(
     private fun processNewGeo() {
         var newPosition: Position
 
-
-
         if (!(::latestPositionFromDB.isInitialized) || !(::latestGeoFromDB.isInitialized)) {
-            newPosition = Position(userID)
-            newPosition.startLocation = address
-            newPosition.startDate = Constants.longToString(newGeo.date)
-            newPosition.firstLocationDate = newGeo.date
-            newPosition.status = Constants.PositionStatus.UNKNOWN.ordinal
-            newPosition.lastLocationDate = newGeo.date
 
-
+            newPosition = Position(
+                startDate = Constants.longToString(newGeo.date),
+                lastLocationDate = newGeo.date,
+                startLocation = address,
+                status = Constants.PositionStatus.UNKNOWN.ordinal,
+                userID = userID
+            )
         } else if (isLatestGeoFromDbTooOld()) {
 
-            newPosition = Position(userID)
-            newPosition.startDate = Constants.longToString(latestPositionFromDB.lastLocationDate)
-            newPosition.endDate = Constants.longToString(newGeo.date)
-            newPosition.firstLocationDate = latestPositionFromDB.lastLocationDate
-            newPosition.lastLocationDate = newGeo.date
-            newPosition.status = Constants.PositionStatus.PAUSE.ordinal
+            newPosition = Position(
+                startDate = Constants.longToString(latestPositionFromDB.lastLocationDate),
+                endDate = Constants.longToString(newGeo.date),
+                firstLocationDate = latestPositionFromDB.lastLocationDate,
+                lastLocationDate = newGeo.date,
+                status = Constants.PositionStatus.PAUSE.ordinal,
+                userID = userID
+            )
 
-            sendGeoAndPosition(newGeo,newPosition)
-            assignGeoToPosition(PositionGeoJoin(newPosition.id, newGeo.id, newGeo.date))
+            sendGeoAndPosition(newGeo, newPosition)
 
-
-            newPosition = Position(userID)
-            newPosition.startLocation = address
-            newPosition.startDate = Constants.longToString(newGeo.date + NEW_POSITION_OFFSET)
-            newPosition.firstLocationDate = newGeo.date + NEW_POSITION_OFFSET
-            newPosition.lastLocationDate = newGeo.date + NEW_POSITION_OFFSET
-            newPosition.status = Constants.PositionStatus.UNKNOWN.ordinal
-
-            //post position
+            newPosition = Position(
+                startDate = Constants.longToString(newGeo.date + NEW_POSITION_OFFSET),
+                firstLocationDate = newGeo.date + NEW_POSITION_OFFSET,
+                lastLocationDate = newGeo.date + NEW_POSITION_OFFSET,
+                startLocation = address,
+                status = Constants.PositionStatus.UNKNOWN.ordinal,
+                userID = userID
+            )
         } else if (latestPositionFromDB.status == Constants.PositionStatus.UNKNOWN.ordinal) {
 
             newPosition = latestPositionFromDB
@@ -145,26 +142,24 @@ class LocationServiceHelper @Inject constructor(
                 newPosition.status = Constants.PositionStatus.STOP.ordinal
             }
             newPosition.lastLocationDate = newGeo.date
-            //post position
         } else if (latestPositionFromDB.status == Constants.PositionStatus.STOP.ordinal) {
 
             if (isLastGeoFarAway()) {
-                newPosition = Position(userID)
-                newPosition.status = Constants.PositionStatus.MOVE.ordinal
-                newPosition.startLocation = latestPositionFromDB.startLocation
-                newPosition.endLocation = address
-                newPosition.firstLocationDate = newGeo.date
-                newPosition.lastLocationDate = newGeo.date + NEW_POSITION_OFFSET
-                newPosition.startDate = latestPositionFromDB.endDate
-                newPosition.endDate = Constants.longToString(newGeo.date)
 
-                //post position
+                newPosition = Position(
+                    startDate = latestPositionFromDB.endDate,
+                    endDate = Constants.longToString(newGeo.date),
+                    firstLocationDate = newGeo.date,
+                    lastLocationDate = newGeo.date + NEW_POSITION_OFFSET,
+                    startLocation = latestPositionFromDB.startLocation,
+                    endLocation = address,
+                    status = Constants.PositionStatus.MOVE.ordinal,
+                    userID = userID
+                )
             } else {
                 newPosition = latestPositionFromDB
                 newPosition.endDate = Constants.longToString(newGeo.date)
                 newPosition.lastLocationDate = newGeo.date
-
-                //post position
             }
         } else if (latestPositionFromDB.status == Constants.PositionStatus.MOVE.ordinal) {
 
@@ -174,35 +169,27 @@ class LocationServiceHelper @Inject constructor(
                 newPosition.lastLocationDate = newGeo.date
                 newPosition.endDate = Constants.longToString(newGeo.date)
                 newPosition.endLocation = address
-
-                // post position
             } else {
 
-                newPosition = Position(userID)
-                newPosition.status = Constants.PositionStatus.MOVE.ordinal
-                newPosition.startLocation = address
-                newPosition.firstLocationDate = newGeo.date
-                newPosition.startDate = latestPositionFromDB.endDate
-                newPosition.endDate = Constants.longToString(newGeo.date)
-                newPosition.lastLocationDate = newGeo.date + NEW_POSITION_OFFSET
-
-                // post position
+                newPosition = Position(
+                    startDate = latestPositionFromDB.endDate,
+                    endDate = Constants.longToString(newGeo.date),
+                    firstLocationDate = newGeo.date,
+                    lastLocationDate = newGeo.date + NEW_POSITION_OFFSET,
+                    startLocation = address,
+                    status = Constants.PositionStatus.MOVE.ordinal,
+                    userID = userID
+                )
             }
         } else {
             throw RuntimeException("Wrong position status")
         }
 
-        sendGeoAndPosition(newGeo,newPosition)
-        assignGeoToPosition(PositionGeoJoin(newPosition.id, newGeo.id, newGeo.date))
-
+        sendGeoAndPosition(newGeo, newPosition)
     }
 
     private fun sendGeoAndPosition(newGeo: Geo, newPosition: Position) {
         repository.sendGeoAndPosition(newGeo, newPosition)
-    }
-
-    private fun assignGeoToPosition(positionGeoJoin: PositionGeoJoin) {
-        repository.assignGeoToPosition(positionGeoJoin)
     }
 
     private fun isLastGeoFarAway(): Boolean {

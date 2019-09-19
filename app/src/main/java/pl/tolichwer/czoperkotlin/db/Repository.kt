@@ -63,9 +63,9 @@ class Repository @Inject constructor(
 
     fun getUserNamesFromDB(): Flowable<List<String>> {
         return userDao.getAllUsers()
-            .map userList@{
-                return@userList it.map {
-                    return@map it.name
+            .map {
+                it.map {
+                    it.name
                 }
             }
     }
@@ -105,42 +105,22 @@ class Repository @Inject constructor(
         return positionDao.getLatestPositionFromDB(userID)
     }
 
-    fun getOldestGeoForPosition(positionID: Long): Single<Geo> {
-        return positionGeoJoinDao.getOldestGeoForPosition(positionID)
+    fun getOldestGeoForPosition(positionId: Long): Single<Geo> {
+        return positionGeoJoinDao.getOldestGeoForPosition(positionId)
     }
 
     fun assignGeoToPosition(positionGeoJoin: PositionGeoJoin) {
         positionGeoJoinDao.insert(positionGeoJoin)
-            // .subscribeOn(Schedulers.io())
-            // .observeOn(Schedulers.io())
-            // .subscribeBy (
-            //     onError = {},
-            //     onSuccess = {}
-            // )
     }
 
     fun sendGeoAndPosition(newGeo: Geo, newPosition: Position) {
         geoDao.insertGeo(newGeo)
         positionDao.insertPosition(newPosition)
+        positionGeoJoinDao.insert(PositionGeoJoin(newGeo.id, newPosition.id, newGeo.date))
 
+        val geoObservable = czoperApi.sendGeo(newGeo.userID, newGeo)
+        val positionObservable = czoperApi.sendPosition(newPosition.userID, newPosition)
 
-
-
-        czoperApi.sendGeo(newGeo.userID, newGeo)
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
-            .subscribeBy (
-                onSuccess = {
-                    //put 0 as geoID  into shared pref so that we know that we dont have to send list next time
-                    //check if position is send
-                },
-                onError = {
-                    //put geoID into shared pref so that we know that we have to send list next time
-                    //save assigned time to pref so we know what data to send
-                }
-            )
-
+        // positionObservable.zipWith(geoObservable, BiFunction(Position,Geo))
     }
-
-
 }

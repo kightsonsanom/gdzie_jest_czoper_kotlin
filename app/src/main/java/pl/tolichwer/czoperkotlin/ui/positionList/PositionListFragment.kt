@@ -28,19 +28,16 @@ class PositionListFragment : DaggerFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.position_list_fragment, container, false)
         viewModel = ViewModelProvider(this, viewModelFactory).get(PositionListFragmentViewModel::class.java)
-
-
         return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         initUserList()
     }
 
     private fun initUserList() {
-        val itemsAdapter: ArrayAdapter<String> = ArrayAdapter(activity!!, android.R.layout.simple_list_item_1)
+        val itemsAdapter: ArrayAdapter<String>? = context?.let { ArrayAdapter(it, android.R.layout.simple_list_item_1) }
 
         binding.userList.adapter = itemsAdapter
 
@@ -49,7 +46,7 @@ class PositionListFragment : DaggerFragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (it.isNotEmpty()) {
-                        itemsAdapter.addAll(it)
+                        itemsAdapter?.addAll(it)
                     }
                 }
         )

@@ -22,7 +22,7 @@
 
 
         <ImageView
-                android:id="@+id/ruch_image"
+                android:id="@+id/move_item_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_directions_run_black_24dp" />
@@ -35,13 +35,13 @@
                 android:orientation="vertical">
 
             <TextView
-                    android:id="@+id/ruch_start_time"
+                    android:id="@+id/move_item_start_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{position.startDate}" />
 
             <TextView
-                    android:id="@+id/ruch_gdzie_od"
+                    android:id="@+id/move_item_start_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{position.startLocation}" />
@@ -61,13 +61,13 @@
                 android:orientation="vertical">
 
             <TextView
-                    android:id="@+id/ruch_end_time"
+                    android:id="@+id/move_item_end_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{position.endDate}" />
 
             <TextView
-                    android:id="@+id/ruch_gdzie_do"
+                    android:id="@+id/move_item_end_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{position.endLocation}" />

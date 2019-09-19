@@ -24,14 +24,14 @@ import pl.tolichwer.czoperkotlin.R
 import pl.tolichwer.czoperkotlin.ui.NavigationActivity
 import javax.inject.Inject
 
-class LocationUpdatesService : DaggerService() {
+const val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 30000
+const val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS: Long = UPDATE_INTERVAL_IN_MILLISECONDS / 2
+const val NOTIFICATION_ID = 34
+const val PACKAGE_NAME = "pl.tolichwer.czoperkotlin.services"
+const val EXTRA_STARTED_FROM_NOTIFICATION = "$PACKAGE_NAME.started_from_notification"
+const val NOTIFICATION_CHANNEL_ID = "channel_01"
 
-    private val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 30000
-    private val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS: Long = UPDATE_INTERVAL_IN_MILLISECONDS / 2
-    private val NOTIFICATION_ID = 12345678
-    private val PACKAGE_NAME = "pl.tolichwer.czoperkotlin.services"
-    private val EXTRA_STARTED_FROM_NOTIFICATION = "$PACKAGE_NAME.started_from_notification"
-    private val NOTIFICATION_CHANNEL_ID = "channel_01"
+class LocationUpdatesService : DaggerService() {
 
     private val binder = LocalBinder()
     private var changingConfiguration = false
