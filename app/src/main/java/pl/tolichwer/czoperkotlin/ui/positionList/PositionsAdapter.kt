@@ -2,10 +2,9 @@ package pl.tolichwer.czoperkotlin.ui.positionList
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import pl.tolichwer.czoperkotlin.R
 import pl.tolichwer.czoperkotlin.databinding.MoveItemBinding
 import pl.tolichwer.czoperkotlin.databinding.PauseItemBinding
 import pl.tolichwer.czoperkotlin.databinding.StopItemBinding
@@ -14,108 +13,90 @@ import pl.tolichwer.czoperkotlin.model.Position
 
 class PositionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private lateinit var positionList: List<Position>
+    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Position>() {
+
+        override fun areItemsTheSame(oldItem: Position, newItem: Position): Boolean {
+            return oldItem === newItem
+        }
+
+        override fun areContentsTheSame(oldItem: Position, newItem: Position): Boolean {
+            return oldItem.id == newItem.id
+        }
+    }
+
+    private val differ = AsyncListDiffer(this, DIFF_CALLBACK)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        var viewHolder: RecyclerView.ViewHolder =
+            UnknownItemVieHolder(UnknownItemBinding.inflate(LayoutInflater.from(parent.context)))
+
+        when (viewType) {
+            PositionType.MOVE.ordinal ->
+                viewHolder = MoveItemViewHolder(MoveItemBinding.inflate(LayoutInflater.from(parent.context)))
+
+            PositionType.STOP.ordinal ->
+                viewHolder = StopItemViewHolder(StopItemBinding.inflate(LayoutInflater.from(parent.context)))
+
+            PositionType.UNKNOWN.ordinal ->
+                viewHolder = UnknownItemVieHolder(UnknownItemBinding.inflate(LayoutInflater.from(parent.context)))
+
+            PositionType.PAUSE.ordinal ->
+                viewHolder = PauseItemViewHolder(PauseItemBinding.inflate(LayoutInflater.from(parent.context)))
+
+        }
+
+        return viewHolder
+    }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-        when (holder.itemViewType) {
-            0 -> {
-                val moveViewHolder = holder as MoveItemViewHolder
-                moveViewHolder.binding.position = positionList[position]
-                moveViewHolder.binding.executePendingBindings()
-            }
-            1 -> {
-                val postojViewHolder = holder as StopItemViewHolder
-                postojViewHolder.binding.position = positionList[position]
-                postojViewHolder.binding.executePendingBindings()
-            }
-            2 -> {
-                val nieznanyVieHolder = holder as UnknownItemVieHolder
-                nieznanyVieHolder.binding.position = positionList[position]
-                nieznanyVieHolder.binding.executePendingBindings()
-            }
-            3 -> {
-                val przerwaViewHolder = holder as PauseItemViewHolder
-                przerwaViewHolder.binding.position = positionList[position]
-                przerwaViewHolder.binding.executePendingBindings()
-            }
+        when(holder.itemViewType){
+            PositionType.MOVE.ordinal -> (holder as MoveItemViewHolder).bind(differ.currentList[position])
+            PositionType.STOP.ordinal -> (holder as StopItemViewHolder).bind(differ.currentList[position])
+            PositionType.UNKNOWN.ordinal -> (holder as UnknownItemVieHolder).bind(differ.currentList[position])
+            PositionType.PAUSE.ordinal -> (holder as PauseItemViewHolder).bind(differ.currentList[position])
         }
+
     }
 
     override fun getItemCount(): Int {
-        return if (positionList == null) 0 else positionList.size
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-
-        when (viewType) {
-            0 -> {
-                val moveItemBinding: MoveItemBinding =
-                    DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.move_item, parent, false)
-                return MoveItemViewHolder(moveItemBinding)
-            }
-            1 -> {
-                val stopItemBinding: StopItemBinding =
-                    DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.stop_item, parent, false)
-                return StopItemViewHolder(stopItemBinding)
-            }
-            2 -> {
-                val unknownItemBinding: UnknownItemBinding =
-                    DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.unknown_item, parent, false)
-                return UnknownItemVieHolder(unknownItemBinding)
-            }
-            3 -> {
-                val pauseItemBinding: PauseItemBinding =
-                    DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.pause_item, parent, false)
-                return PauseItemViewHolder(pauseItemBinding)
-            }
-            else -> {
-                val unknownItemBinding: UnknownItemBinding =
-                    DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.unknown_item, parent, false)
-                return UnknownItemVieHolder(unknownItemBinding)
-            }
-        }
-    }
-
-    fun setPositionsList(positionList: List<Position>) {
-        if (this.positionList.isEmpty()) {
-            this.positionList = positionList
-            notifyItemRangeInserted(0, positionList.size)
-        } else {
-            val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun getOldListSize(): Int {
-                    return this@PositionsAdapter.positionList.size
-                }
-
-                override fun getNewListSize(): Int {
-                    return positionList.size
-                }
-
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return this@PositionsAdapter.positionList[oldItemPosition].id == positionList[newItemPosition].id
-                }
-
-                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    val newAction = positionList[newItemPosition]
-                    val oldAction = this@PositionsAdapter.positionList[oldItemPosition]
-                    return newAction.id == oldAction.id
-                }
-            })
-            this.positionList = positionList
-            result.dispatchUpdatesTo(this)
-        }
-        notifyDataSetChanged()
+        return differ.currentList.size
     }
 
     override fun getItemViewType(position: Int): Int {
-        return positionList[position].status
+        return differ.currentList[position].status
     }
 
-    inner class MoveItemViewHolder(val binding: MoveItemBinding) : RecyclerView.ViewHolder(binding.root)
+    fun submitList(list: List<Position>) {
+        differ.submitList(list)
+    }
 
-    inner class StopItemViewHolder(val binding: StopItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class MoveItemViewHolder(val binding: MoveItemBinding) : RecyclerView.ViewHolder(binding.root){
+        fun bind(position: Position){
+            binding.position = position
+            binding.executePendingBindings()
+        }
+    }
 
-    inner class PauseItemViewHolder(val binding: PauseItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class StopItemViewHolder(val binding: StopItemBinding) : RecyclerView.ViewHolder(binding.root){
+        fun bind(position: Position){
+            binding.position = position
+            binding.executePendingBindings()
+        }
+    }
 
-    inner class UnknownItemVieHolder(val binding: UnknownItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class PauseItemViewHolder(val binding: PauseItemBinding) : RecyclerView.ViewHolder(binding.root){
+        fun bind(position: Position){
+            binding.position = position
+            binding.executePendingBindings()
+        }
+    }
+
+    class UnknownItemVieHolder(val binding: UnknownItemBinding) : RecyclerView.ViewHolder(binding.root){
+        fun bind(position: Position){
+            binding.position = position
+            binding.executePendingBindings()
+        }
+    }
+
 }

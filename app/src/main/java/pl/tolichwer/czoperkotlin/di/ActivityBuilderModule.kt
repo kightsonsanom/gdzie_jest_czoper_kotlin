@@ -1,9 +1,9 @@
 package pl.tolichwer.czoperkotlin.di
 
-import pl.tolichwer.czoperkotlin.ui.NavigationActivity
-import pl.tolichwer.czoperkotlin.ui.loginView.LoginActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import pl.tolichwer.czoperkotlin.ui.NavigationActivity
+import pl.tolichwer.czoperkotlin.ui.loginView.LoginActivity
 
 @Module
 abstract class ActivityBuilderModule {
@@ -13,5 +13,4 @@ abstract class ActivityBuilderModule {
 
     @ContributesAndroidInjector
     abstract fun contributeLoginActivity(): LoginActivity
-
 }

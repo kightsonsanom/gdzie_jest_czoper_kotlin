@@ -36,8 +36,8 @@ class DatePickerFragment : DialogFragment() {
 
         nextYear.add(Calendar.YEAR, 10)
         lastYear.add(Calendar.YEAR, -10)
-        calendar.init(lastYear.time, nextYear.time, SimpleDateFormat("MMMM, YYYY", Locale.getDefault())) //
-            .inMode(CalendarPickerView.SelectionMode.RANGE) //
+        calendar.init(lastYear.time, nextYear.time, SimpleDateFormat("MMMM, yyyy", Locale.getDefault()))
+            .inMode(CalendarPickerView.SelectionMode.RANGE)
 
         calendar.scrollToDate(Date())
 

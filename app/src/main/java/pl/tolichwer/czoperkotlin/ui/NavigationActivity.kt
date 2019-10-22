@@ -10,54 +10,33 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import pl.tolichwer.czoperkotlin.R
-import pl.tolichwer.czoperkotlin.db.SharedPreferencesRepository
-import pl.tolichwer.czoperkotlin.services.LocationUpdatesService
-import pl.tolichwer.czoperkotlin.ui.mapView.MapFragment
-import pl.tolichwer.czoperkotlin.ui.positionList.PositionListFragment
-import pl.tolichwer.czoperkotlin.ui.searchView.SearchFragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.android.support.DaggerAppCompatActivity
+import pl.tolichwer.czoperkotlin.R
+import pl.tolichwer.czoperkotlin.db.SharedPreferencesRepository
+import pl.tolichwer.czoperkotlin.di.ViewModelFactory
+import pl.tolichwer.czoperkotlin.services.LocationUpdatesService
+import pl.tolichwer.czoperkotlin.ui.loginView.LoginActivityViewModel
+import pl.tolichwer.czoperkotlin.ui.mapView.PERMISSION_REQUEST_CODE
 import javax.inject.Inject
 
 class NavigationActivity : DaggerAppCompatActivity() {
 
-    private val PERMISSION_REQUEST_CODE = 100
     private var isServiceBound = false
     private lateinit var locationService: LocationUpdatesService
+    private lateinit var viewModel: LoginActivityViewModel
 
     @Inject
     lateinit var sharedPreferencesRepository: SharedPreferencesRepository
 
-    private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_home -> {
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.container, PositionListFragment(), getString(R.string.geo_list_fragment_tag))
-                    .commit()
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_dashboard -> {
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.container, MapFragment(), getString(R.string.map_fragment_tag))
-                    .commit()
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_notifications -> {
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.container, SearchFragment(), getString(R.string.search_fragment_tag))
-                    .commit()
-                return@OnNavigationItemSelectedListener true
-            }
-        }
-        false
-    }
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
 
     private val serviceConnection = object : ServiceConnection {
-
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             val binder = service as LocationUpdatesService.LocalBinder
             locationService = binder.service
@@ -66,41 +45,38 @@ class NavigationActivity : DaggerAppCompatActivity() {
 
         override fun onServiceDisconnected(name: ComponentName) {
             sharedPreferencesRepository.setLocationServiceStatus(false)
-
         }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val navView: BottomNavigationView = findViewById(R.id.nav_view)
+        viewModel =
+            ViewModelProvider(this, viewModelFactory).get(LoginActivityViewModel::class.java)
 
 
-        navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        val navController = findNavController(R.id.nav_host_fragment)
+        val navView = findViewById<BottomNavigationView>(R.id.nav_view)
+        navView?.setupWithNavController(navController)
 
-        if (savedInstanceState == null) {
-            val fragment = MapFragment()
-            supportFragmentManager.beginTransaction().replace(R.id.container, fragment, getString(R.string.search_fragment_tag))
-                .commit()
-            navView.selectedItemId = R.id.navigation_dashboard
-        }
         bindService(
             Intent(this, LocationUpdatesService::class.java), serviceConnection,
             Context.BIND_AUTO_CREATE
         )
 
-        checkPermissions()
     }
 
     override fun onResume() {
         super.onResume()
         isServiceBound = sharedPreferencesRepository.isLocationServiceRunning()
-
     }
+
 
     private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -109,9 +85,14 @@ class NavigationActivity : DaggerAppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
 
-        when (requestCode){
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+
+        when (requestCode) {
             PERMISSION_REQUEST_CODE -> {
                 startGeoService()
             }
@@ -122,13 +103,14 @@ class NavigationActivity : DaggerAppCompatActivity() {
         locationService.requestLocationUpdates()
     }
 
+
+
     override fun onStop() {
-        if (isServiceBound){
+        if (isServiceBound) {
             unbindService(serviceConnection)
             sharedPreferencesRepository.setLocationServiceStatus(false)
         }
 
         super.onStop()
     }
-
 }

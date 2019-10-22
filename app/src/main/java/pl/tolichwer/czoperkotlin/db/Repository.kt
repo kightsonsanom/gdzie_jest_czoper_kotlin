@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import pl.tolichwer.czoperkotlin.api.ApiResource
 import pl.tolichwer.czoperkotlin.api.CzoperApi
@@ -18,8 +21,12 @@ import pl.tolichwer.czoperkotlin.model.Geo
 import pl.tolichwer.czoperkotlin.model.Position
 import pl.tolichwer.czoperkotlin.model.PositionGeoJoin
 import pl.tolichwer.czoperkotlin.model.User
+import pl.tolichwer.czoperkotlin.model.utilityobjects.RemotePositionGeoJoin
 import retrofit2.Response
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+
 
 class Repository @Inject constructor(
     private val czoperApi: CzoperApi,
@@ -49,7 +56,6 @@ class Repository @Inject constructor(
                                 ?.filter { user ->
                                     user.name == login && user.password == password
                                 }
-
                         sharedPreferencesRepository.saveCurrentUserID(currentUser!![0].userID)
                         return@map it
                     }
@@ -59,15 +65,6 @@ class Repository @Inject constructor(
 
     fun getUsersFromDB(): Flowable<List<User>> {
         return userDao.getAllUsers()
-    }
-
-    fun getUserNamesFromDB(): Flowable<List<String>> {
-        return userDao.getAllUsers()
-            .map {
-                it.map {
-                    it.name
-                }
-            }
     }
 
     fun isLocationSerivceRunning(): Boolean {
@@ -109,18 +106,92 @@ class Repository @Inject constructor(
         return positionGeoJoinDao.getOldestGeoForPosition(positionId)
     }
 
-    fun assignGeoToPosition(positionGeoJoin: PositionGeoJoin) {
-        positionGeoJoinDao.insert(positionGeoJoin)
+    fun assignGeoToPositionOnServer(positionGeoJoin: PositionGeoJoin) {
+
+        czoperApi.assignGeoToPosition(RemotePositionGeoJoin(positionGeoJoin.positionId,positionGeoJoin.geoId))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy (
+                onError = {
+                    sharedPreferencesRepository.setFailureTimestamp(positionGeoJoin.assignTime)
+                },
+
+
+                onSuccess = {
+                    sharedPreferencesRepository.setFailureTimestamp(0)
+                }
+            )
     }
 
     fun sendGeoAndPosition(newGeo: Geo, newPosition: Position) {
+        val positionGeoJoin = PositionGeoJoin(newGeo.id, newPosition.id, newGeo.date)
+
+
+
         geoDao.insertGeo(newGeo)
-        positionDao.insertPosition(newPosition)
-        positionGeoJoinDao.insert(PositionGeoJoin(newGeo.id, newPosition.id, newGeo.date))
+            .zipWith(positionDao.insertPosition(newPosition)){
+                geoResponse, positionRespone -> Log.d("inserResponse", "geoResponse = $geoResponse and positionResponse = $positionRespone ")
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .subscribeBy(
+                onError = { Log.d("insertMergeError", "$it ") },
+                onSuccess = {
+
+                    Log.d("onCompleteMerge", "$it")
+                    positionGeoJoinDao.insert(positionGeoJoin)
+                        .delay(1000, TimeUnit.MILLISECONDS)
+                        .subscribeOn(Schedulers.io())
+                        .subscribeBy(
+                            onError = { Log.d("insertAssignError", "$it ") },
+                            onSuccess = { Log.d("insertAssignSuccess", "$it") }
+                        )
+                }
+            )
+
+
+        // geoDao.insertGeo(newGeo)
+        //     .subscribeOn(Schedulers.io())
+        //     .subscribeBy(
+        //         onError = { Log.d("insertGeoError", "$it ") },
+        //         onSuccess = { Log.d("insertGeoSuccess", "$it") }
+        //     )
+        //
+        // positionDao.insertPosition(newPosition)
+        //     .subscribeOn(Schedulers.io())
+        //     .subscribeBy(
+        //         onError = { Log.d("insertPositionError", "$it ") },
+        //         onSuccess = { Log.d("insertPositionSuccess", "$it") }
+        //     )
 
         val geoObservable = czoperApi.sendGeo(newGeo.userID, newGeo)
         val positionObservable = czoperApi.sendPosition(newPosition.userID, newPosition)
 
-        // positionObservable.zipWith(geoObservable, BiFunction(Position,Geo))
+        Observable.merge(
+            geoObservable.subscribeOn(Schedulers.io()),
+            positionObservable.subscribeOn(Schedulers.io())
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError ={
+                    Log.d("sendGeoAndPositionTag", "onError: $it")
+                    sharedPreferencesRepository.putPositionID(newGeo.id)
+                    sharedPreferencesRepository.putPositionID(newPosition.id)
+                    sharedPreferencesRepository.setFailureTimestamp(newGeo.date)
+
+                },
+                onComplete = {
+                    Log.d("sendGeoAndPositionTag", "onComplete")
+
+                    sharedPreferencesRepository.putGeoID(0)
+                    sharedPreferencesRepository.putPositionID(0)
+                    assignGeoToPositionOnServer(positionGeoJoin)
+                }
+            )
+
+
     }
+
+
 }
+

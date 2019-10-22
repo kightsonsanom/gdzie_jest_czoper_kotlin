@@ -38,6 +38,9 @@ class LoginActivity : DaggerAppCompatActivity() {
         binding.btnLogin.setOnClickListener {
             attemptLogin()
         }
+
+        binding.username.setText("Tomek")
+        binding.password.setText("tomek")
     }
 
     private fun attemptLogin() {

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/nav_graph"
+        app:startDestination="@id/navigation_map">
+
+    <activity
+            android:id="@+id/navigationActivity"
+            android:name="pl.tolichwer.czoperkotlin.ui.NavigationActivity"
+            android:label="NavigationActivity" />
+
+    <fragment
+            android:id="@+id/navigation_map"
+            android:name="pl.tolichwer.czoperkotlin.ui.mapView.MapFragment"
+            android:label="MapFragment"
+            tools:layout="@layout/map_fragment"/>
+
+    <fragment
+            android:id="@+id/navigation_search"
+            android:name="pl.tolichwer.czoperkotlin.ui.searchView.SearchFragment"
+            android:label="SearchFragment"
+            tools:layout="@layout/search_fragment"/>
+    <fragment
+            android:id="@+id/navigation_position_list"
+            android:name="pl.tolichwer.czoperkotlin.ui.positionList.PositionListFragment"
+            android:label="PositionListFragment"
+            tools:layout="@layout/position_list_fragment"/>
+
+    <fragment
+            android:id="@+id/navigation_user_list"
+            android:name="pl.tolichwer.czoperkotlin.ui.positionList.UserListFragment"
+            android:label="UserListFragment"
+            tools:layout="@layout/user_list_fragment">
+
+        <action
+                android:id="@+id/next_destination"
+                app:destination="@+id/navigation_position_list" />
+
+    </fragment>
+
+    <fragment
+            android:id="@+id/datePickerFragment"
+            android:name="pl.tolichwer.czoperkotlin.ui.searchView.DatePickerFragment"
+            android:label="DatePickerFragment"
+            tools:layout="@layout/date_picker_fragment" />
+</navigation>

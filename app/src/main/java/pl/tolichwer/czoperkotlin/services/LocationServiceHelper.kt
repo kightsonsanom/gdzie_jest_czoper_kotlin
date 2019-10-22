@@ -87,7 +87,6 @@ class LocationServiceHelper @Inject constructor(
                 onSuccess = {
                     latestGeoFromDB = it
                     processNewGeo()
-
                 }
             )
     }

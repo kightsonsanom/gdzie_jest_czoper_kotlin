@@ -7,12 +7,12 @@ import androidx.room.ForeignKey
     tableName = "position_geo_join", primaryKeys = ["positionId", "geoId"],
     foreignKeys = [ForeignKey(
         entity = Position::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("positionId")
+        parentColumns = ["id"],
+        childColumns = ["positionId"]
     ), ForeignKey(
         entity = Geo::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("geoId")
+        parentColumns = ["id"],
+        childColumns = ["geoId"]
     )]
 )
 data class PositionGeoJoin(

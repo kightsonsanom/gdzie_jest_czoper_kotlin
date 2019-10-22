@@ -9,12 +9,6 @@
             android:gravity="top"
             android:orientation="vertical">
 
-        <ListView
-                android:id="@+id/user_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-        </ListView>
-
         <TextView
                 android:id="@+id/current_day"
                 android:layout_width="match_parent"
@@ -32,7 +26,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 app:layoutManager="LinearLayoutManager"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                />
     </LinearLayout>
 
 

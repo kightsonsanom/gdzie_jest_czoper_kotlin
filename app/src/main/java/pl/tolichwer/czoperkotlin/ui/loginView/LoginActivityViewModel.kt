@@ -41,12 +41,10 @@ class LoginActivityViewModel @Inject constructor(
     }
 
     fun getUsers(): Flowable<ApiResource<List<User>>> {
-
         return repository.getUsers(username, password)
     }
 
     fun isUserLoggedIn(): Flowable<List<User>> {
-
         return repository.getUsersFromDB()
     }
 

@@ -1,6 +1,7 @@
 package pl.tolichwer.czoperkotlin.api
 
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import pl.tolichwer.czoperkotlin.model.Geo
 import pl.tolichwer.czoperkotlin.model.Position
@@ -26,10 +27,10 @@ interface CzoperApi {
     fun sendPositionList(@Path("userid") userid: Int, @Body positionList: List<Position>): Call<Void>
 
     @PUT("position/{userid}")
-    fun sendPosition(@Path("userid") userid: Int, @Body position: Position): Single<Void>
+    fun sendPosition(@Path("userid") userid: Int, @Body position: Position): Observable<Void>
 
     @PUT("geo/{userid}")
-    fun sendGeo(@Path("userid") userid: Int, @Body geo: Geo): Single<Void>
+    fun sendGeo(@Path("userid") userid: Int, @Body geo: Geo): Observable<Void>
 
     @Headers("Content-Type: application/json")
     @PUT("geo/geoList/{userid}")
@@ -37,7 +38,7 @@ interface CzoperApi {
 
     @Headers("Content-Type: application/json")
     @POST("assignGeoToPosition")
-    fun assignGeoToPosition(@Body remotePositionGeoJoin: RemotePositionGeoJoin): Call<Void>
+    fun assignGeoToPosition(@Body remotePositionGeoJoin: RemotePositionGeoJoin): Single<Void>
 
     @Headers("Content-Type: application/json")
     @POST("assignGeoToPosition/list")
