@@ -15,10 +15,8 @@ import pl.tolichwer.czoperkotlin.ui.loginView.LoginActivity
 const val USERNAME = "Tomek"
 const val PASSWORD = "tomek"
 
-
 @RunWith(AndroidJUnit4ClassRunner::class)
 class LoginActivityUITest {
-
 
     @Rule
     var loginActivityRule: ActivityTestRule<LoginActivity> = ActivityTestRule(LoginActivity::class.java)
@@ -30,9 +28,6 @@ class LoginActivityUITest {
         onView(withId(R.id.password)).perform(ViewActions.clearText(), typeText(PASSWORD))
         onView(withId(R.id.btn_login))
             .perform(click())
-
-        // intended(hasC)
-
 
 
     }

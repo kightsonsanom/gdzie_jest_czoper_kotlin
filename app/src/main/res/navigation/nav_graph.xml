@@ -14,29 +14,34 @@
             android:id="@+id/navigation_map"
             android:name="pl.tolichwer.czoperkotlin.ui.mapView.MapFragment"
             android:label="MapFragment"
-            tools:layout="@layout/map_fragment"/>
+            tools:layout="@layout/map_fragment" />
 
     <fragment
             android:id="@+id/navigation_search"
             android:name="pl.tolichwer.czoperkotlin.ui.searchView.SearchFragment"
             android:label="SearchFragment"
-            tools:layout="@layout/search_fragment"/>
-    <fragment
-            android:id="@+id/navigation_position_list"
-            android:name="pl.tolichwer.czoperkotlin.ui.positionList.PositionListFragment"
-            android:label="PositionListFragment"
-            tools:layout="@layout/position_list_fragment"/>
+            tools:layout="@layout/search_fragment" />
+
 
     <fragment
             android:id="@+id/navigation_user_list"
             android:name="pl.tolichwer.czoperkotlin.ui.positionList.UserListFragment"
             android:label="UserListFragment"
             tools:layout="@layout/user_list_fragment">
-
         <action
                 android:id="@+id/next_destination"
                 app:destination="@+id/navigation_position_list" />
+    </fragment>
 
+    <fragment
+            android:id="@+id/navigation_position_list"
+            android:name="pl.tolichwer.czoperkotlin.ui.positionList.PositionListFragment"
+            android:label="PositionListFragment"
+            tools:layout="@layout/position_list_fragment">
+
+        <argument
+                android:name="selectedUser"
+                app:argType="pl.tolichwer.czoperkotlin.model.User" />
     </fragment>
 
     <fragment
