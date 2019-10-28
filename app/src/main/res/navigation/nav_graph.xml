@@ -39,9 +39,6 @@
             android:label="PositionListFragment"
             tools:layout="@layout/position_list_fragment">
 
-        <argument
-                android:name="selectedUser"
-                app:argType="pl.tolichwer.czoperkotlin.model.User" />
     </fragment>
 
     <fragment

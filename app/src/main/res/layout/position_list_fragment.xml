@@ -2,6 +2,13 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+                name="viewModel"
+                type="pl.tolichwer.czoperkotlin.ui.positionList.PositionListFragmentViewModel" />
+    </data>
+
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -10,26 +17,31 @@
             android:orientation="vertical">
 
         <TextView
-                android:id="@+id/current_day"
+                android:id="@+id/current_user"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="model.currentDay"
-                android:textSize="20sp"
+                android:text="@{viewModel.selectedUser.name}"
+                android:textSize="20sp" />
+
+        <TextView
+                android:id="@+id/current_day"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_margin="20dp"
-                android:textStyle="bold"
-                android:visibility="gone"/>
+                android:gravity="center"
+                android:text="@{viewModel.currentDay}"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/position_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                app:layoutManager="LinearLayoutManager"
-                android:visibility="gone"
-                />
-    </LinearLayout>
+                app:layoutManager="LinearLayoutManager" />
 
+    </LinearLayout>
 
 
 </layout>

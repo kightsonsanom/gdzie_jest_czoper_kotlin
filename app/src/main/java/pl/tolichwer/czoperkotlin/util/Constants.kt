@@ -15,6 +15,8 @@ object Constants {
     const val START_DATE = "START_DATE"
     const val END_DATE = "END_DATE"
 
+    val CURRENTDAY = getCurrentDay()
+
     enum class PositionStatus {
         MOVE, STOP, UNKNOWN, PAUSE,
     }
@@ -24,6 +26,11 @@ object Constants {
         val sdf = SimpleDateFormat("HH:mm:ss", Locale("pl"))
 
         return sdf.format(data)
+    }
+
+    private fun getCurrentDay(): String {
+        val date = Date(System.currentTimeMillis())
+        return SimpleDateFormat("dd MMM", Locale("pl")).format(date)
     }
 
 

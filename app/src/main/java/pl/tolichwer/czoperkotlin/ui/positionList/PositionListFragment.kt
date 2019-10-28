@@ -19,15 +19,23 @@ class PositionListFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    private val viewModel: PositionListFragmentViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(PositionListFragmentViewModel::class.java)
-    }
+    lateinit var viewModel: PositionListFragmentViewModel
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.position_list_fragment, container, false)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.position_list_fragment, container, false)
+        viewModel =
+            activity?.run { ViewModelProvider(this, viewModelFactory).get(PositionListFragmentViewModel::class.java) }
+                ?: throw Exception("Invalid Activity")
+
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
         return binding.root
     }
-
 }
 
