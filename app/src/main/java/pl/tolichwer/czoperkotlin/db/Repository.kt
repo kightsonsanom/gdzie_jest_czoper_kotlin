@@ -23,7 +23,6 @@ import pl.tolichwer.czoperkotlin.model.PositionGeoJoin
 import pl.tolichwer.czoperkotlin.model.User
 import pl.tolichwer.czoperkotlin.model.utilityobjects.RemotePositionGeoJoin
 import retrofit2.Response
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -85,14 +84,7 @@ class Repository @Inject constructor(
             )
     }
 
-    fun getAllGeos(): Disposable {
-        return geoDao.getAllGeos()
-            .subscribeOn(Schedulers.io())
-            .subscribeBy(
-                onError = { Log.d("getAllGeos", "Error getting geos ") },
-                onSuccess = { Log.d("getAllGeos", "Success! List of geos: ${it.map { return@map "$it\n" }}") }
-            )
-    }
+
 
     fun getLatesGeoFromDB(userID: Int): Single<Geo> {
         return geoDao.loadLatestGeo(userID)
@@ -102,21 +94,18 @@ class Repository @Inject constructor(
         return positionDao.getLatestPositionFromDB(userID)
     }
 
-    fun getOldestGeoForPosition(positionId: Long): Single<Geo> {
-        return positionGeoJoinDao.getOldestGeoForPosition(positionId)
+    fun getOldestGeoForPosition(positionid: Long): Single<Geo> {
+        return positionGeoJoinDao.getOldestGeoForPosition(positionid)
     }
 
-    fun assignGeoToPositionOnServer(positionGeoJoin: PositionGeoJoin) {
-
-        czoperApi.assignGeoToPosition(RemotePositionGeoJoin(positionGeoJoin.positionId,positionGeoJoin.geoId))
+    private fun assignGeoToPositionOnServer(positionGeoJoin: PositionGeoJoin) {
+        czoperApi.assignGeoToPosition(RemotePositionGeoJoin(positionGeoJoin.positionid,positionGeoJoin.geoid))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy (
                 onError = {
                     sharedPreferencesRepository.setFailureTimestamp(positionGeoJoin.assignTime)
                 },
-
-
                 onSuccess = {
                     sharedPreferencesRepository.setFailureTimestamp(0)
                 }
@@ -124,9 +113,7 @@ class Repository @Inject constructor(
     }
 
     fun sendGeoAndPosition(newGeo: Geo, newPosition: Position) {
-        val positionGeoJoin = PositionGeoJoin(newGeo.id, newPosition.id, newGeo.date)
-
-
+        val positionGeoJoin = PositionGeoJoin(newPosition.id,newGeo.id, newGeo.date)
 
         geoDao.insertGeo(newGeo)
             .zipWith(positionDao.insertPosition(newPosition)){
@@ -136,19 +123,20 @@ class Repository @Inject constructor(
             .observeOn(Schedulers.io())
             .subscribeBy(
                 onError = { Log.d("insertMergeError", "$it ") },
+
                 onSuccess = {
 
-                    Log.d("onCompleteMerge", "$it")
+                    getDatabaseInfo()
+                    Log.d("onCompleteMerge", "$it, positionjoin = $positionGeoJoin")
                     positionGeoJoinDao.insert(positionGeoJoin)
-                        .delay(1000, TimeUnit.MILLISECONDS)
                         .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
                         .subscribeBy(
                             onError = { Log.d("insertAssignError", "$it ") },
                             onSuccess = { Log.d("insertAssignSuccess", "$it") }
                         )
                 }
             )
-
 
         // geoDao.insertGeo(newGeo)
         //     .subscribeOn(Schedulers.io())
@@ -189,9 +177,40 @@ class Repository @Inject constructor(
                 }
             )
 
-
     }
 
+    private fun getDatabaseInfo() {
+        getAllGeos()
+        getAllPositions()
+        getAllAssigns()
+    }
+
+    private fun getAllGeos(): Disposable {
+        return geoDao.getAllGeos()
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onError = { Log.d("getAllGeos", "Error getting geos ") },
+                onSuccess = { Log.d("getAllGeos", "Success! List of geos: ${it.map { return@map "$it\n" }}") }
+            )
+    }
+
+    private fun getAllPositions(): Disposable {
+        return positionDao.getAllPositions()
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onError = { Log.d("getAllPositions", "Error getting positions ") },
+                onSuccess = { Log.d("getAllPositions", "Success! List of positions: ${it.map { return@map "$it\n" }}") }
+            )
+    }
+
+    private fun getAllAssigns(): Disposable {
+        return positionGeoJoinDao.getAllAssigns()
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onError = { Log.d("getAllAssigns", "Error getting assigns ") },
+                onSuccess = { Log.d("getAllAssigns", "Success! List of assigns: ${it.map { return@map "$it\n" }}") }
+            )
+    }
 
 }
 

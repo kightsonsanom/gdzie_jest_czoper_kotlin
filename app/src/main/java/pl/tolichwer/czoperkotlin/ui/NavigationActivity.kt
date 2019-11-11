@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -60,6 +61,8 @@ class NavigationActivity : DaggerAppCompatActivity() {
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)
         navView?.setupWithNavController(navController)
 
+        checkPermissions()
+
         bindService(
             Intent(this, LocationUpdatesService::class.java), serviceConnection,
             Context.BIND_AUTO_CREATE
@@ -100,6 +103,8 @@ class NavigationActivity : DaggerAppCompatActivity() {
     }
 
     private fun startGeoService() {
+        Log.d("NavigationActivity", "startingGeoService")
+
         locationService.requestLocationUpdates()
     }
 

@@ -19,5 +19,8 @@ interface PositionDao{
     @Query("SELECT * FROM position WHERE position.userID= :userID ORDER BY lastLocationDate DESC LIMIT 1")
     fun getLatestPositionFromDB(userID: Int): Single<Position>
 
+    @Query("SELECT * FROM position")
+    fun getAllPositions(): Single<List<Position>>
+
 
 }

@@ -23,12 +23,15 @@ interface PositionGeoJoinDao {
 
     @Query(
         ("SELECT * FROM (SELECT * FROM geo " +
-            "INNER JOIN position_geo_join ON geo.id = position_geo_join.geoId " +
-            "WHERE position_geo_join.positionId=:positionId)" +
+            "INNER JOIN positiongeojoin ON geo.id = positiongeojoin.geoId " +
+            "WHERE positiongeojoin.positionid=:positionid)" +
             "ORDER BY date LIMIT 1")
     )
-    fun getOldestGeoForPosition(positionId: Long): Single<Geo>
+    fun getOldestGeoForPosition(positionid: Long): Single<Geo>
 
-    @Query("SELECT * FROM position_geo_join WHERE position_geo_join.assignTime >= :positionIdFromPreferences")
+    @Query("SELECT * FROM positiongeojoin WHERE positiongeojoin.assignTime >= :positionIdFromPreferences")
     fun getAssignsSinceFailure(positionIdFromPreferences: Long): List<PositionGeoJoin>
+
+    @Query("SELECT * FROM positiongeojoin")
+    fun getAllAssigns(): Single<List<PositionGeoJoin>>
 }

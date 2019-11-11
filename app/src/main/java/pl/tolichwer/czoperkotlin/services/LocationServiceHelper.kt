@@ -60,11 +60,11 @@ class LocationServiceHelper @Inject constructor(
             .subscribeOn(Schedulers.io())
             .subscribeBy(
                 onError = {
-                    Log.d("getLastPositionFromDb", "$it")
+                    Log.d("getLastPositionFromDb", "onError: $it")
                     getLatestGeoFromDB()
                 },
                 onSuccess = {
-                    Log.d("getLastPositionFromDb", "$it")
+                    Log.d("getLastPositionFromDb", "onSuccess: $it")
                     latestPositionFromDB = it
                     if (it.status == Constants.PositionStatus.STOP.ordinal) {
                         getOldestGeoForPositionFromDB()
@@ -82,9 +82,12 @@ class LocationServiceHelper @Inject constructor(
             .subscribeOn(Schedulers.io())
             .subscribeBy(
                 onError = {
+                    Log.d("getLatestGeoFromDB", "onError: $it")
+
                     processNewGeo()
                 },
                 onSuccess = {
+                    Log.d("getLatestGeoFromDB", "onSuccess: $it")
                     latestGeoFromDB = it
                     processNewGeo()
                 }

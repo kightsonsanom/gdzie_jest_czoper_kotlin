@@ -15,7 +15,7 @@ object Constants {
     const val START_DATE = "START_DATE"
     const val END_DATE = "END_DATE"
 
-    val CURRENTDAY = getCurrentDay()
+    val CURRENT_DAY = getCurrentDay()
 
     enum class PositionStatus {
         MOVE, STOP, UNKNOWN, PAUSE,

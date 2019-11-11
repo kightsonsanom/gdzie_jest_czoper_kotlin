@@ -14,7 +14,7 @@ class PositionListFragmentViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    val currentDay = Constants.CURRENTDAY
+    val currentDay = Constants.CURRENT_DAY
     private val _selectedUser = MutableLiveData<User>()
 
     val selectedUser: LiveData<User>
@@ -24,6 +24,7 @@ class PositionListFragmentViewModel @Inject constructor(
 
     val users: LiveData<List<User>>
         get() = _users
+
 
     init {
         getUsersForList()
