@@ -20,7 +20,7 @@ import retrofit2.http.Query
 interface CzoperApi {
 
     @GET("user")
-    fun getUsers(@Query("login") login: String, @Query("password") password: String): Flowable<Response<List<User>>>
+    fun getUsers(@Query("login") login: String, @Query("password") password: String): List<User>
 
     @Headers("Content-Type: application/json")
     @PUT("position/positionList/{userid}")

@@ -11,8 +11,8 @@ import pl.tolichwer.czoperkotlin.model.User
 interface UserDao{
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(userList: List<User>)
+    suspend fun insertAll(userList: List<User>)
 
     @Query("SELECT * FROM user")
-    fun getAllUsers (): Flowable<List<User>>
+    suspend fun getAllUsers (): List<User>
 }

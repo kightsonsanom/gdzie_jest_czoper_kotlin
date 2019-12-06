@@ -22,7 +22,6 @@ class SearchFragment : DaggerFragment(), SearchFragmentViewModelCallback {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.search_fragment, container, false)
 
-
         setOnClickListeners()
         return binding.root
     }

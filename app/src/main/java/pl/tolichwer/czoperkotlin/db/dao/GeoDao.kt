@@ -15,8 +15,8 @@ interface GeoDao{
     fun insertGeo(geo: Geo): Single<Long>
 
     @Query("SELECT * FROM geo")
-    fun getAllGeos(): Single<List<Geo>>
+     fun getAllGeos(): Single<List<Geo>>
 
     @Query("SELECT * FROM geo g WHERE g.userID=:userID ORDER BY date DESC LIMIT 1")
-    fun loadLatestGeo(userID: Int): Single<Geo>
+     fun loadLatestGeo(userID: Int): Single<Geo>
 }

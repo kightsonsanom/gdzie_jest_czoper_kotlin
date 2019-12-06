@@ -3,7 +3,6 @@ package pl.tolichwer.czoperkotlin.db
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,8 +24,6 @@ import pl.tolichwer.czoperkotlin.model.utilityobjects.RemotePositionGeoJoin
 import retrofit2.Response
 import javax.inject.Inject
 
-
-
 class Repository @Inject constructor(
     private val czoperApi: CzoperApi,
     private val geoDao: GeoDao,
@@ -37,32 +34,11 @@ class Repository @Inject constructor(
     private val sharedPreferencesRepository: SharedPreferencesRepository
 ) {
 
-    fun getUsers(login: String, password: String): Flowable<ApiResource<List<User>>> {
-        return object : NetworkBoundResource<List<User>, List<User>>(context) {
-            override fun saveCallResult(request: List<User>) {
-                userDao.insertAll(request)
-            }
-
-            override fun loadFromDb(): Flowable<List<User>> {
-                return userDao.getAllUsers()
-            }
-
-            override fun createCall(): Flowable<Response<List<User>>> {
-                return czoperApi.getUsers(login, password)
-                    .map {
-                        val currentUser =
-                            it.body()
-                                ?.filter { user ->
-                                    user.name == login && user.password == password
-                                }
-                        sharedPreferencesRepository.saveCurrentUserID(currentUser!![0].userID)
-                        return@map it
-                    }
-            }
-        }.asFlowable()
+    fun getUsers(login: String, password: String): List<User> {
+        return czoperApi.getUsers(login,password)
     }
 
-    fun getUsersFromDB(): Flowable<List<User>> {
+    suspend fun getUsersFromDB(): List<User> {
         return userDao.getAllUsers()
     }
 
@@ -84,8 +60,6 @@ class Repository @Inject constructor(
             )
     }
 
-
-
     fun getLatesGeoFromDB(userID: Int): Single<Geo> {
         return geoDao.loadLatestGeo(userID)
     }
@@ -99,10 +73,10 @@ class Repository @Inject constructor(
     }
 
     private fun assignGeoToPositionOnServer(positionGeoJoin: PositionGeoJoin) {
-        czoperApi.assignGeoToPosition(RemotePositionGeoJoin(positionGeoJoin.positionid,positionGeoJoin.geoid))
+        czoperApi.assignGeoToPosition(RemotePositionGeoJoin(positionGeoJoin.positionid, positionGeoJoin.geoid))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy (
+            .subscribeBy(
                 onError = {
                     sharedPreferencesRepository.setFailureTimestamp(positionGeoJoin.assignTime)
                 },
@@ -113,11 +87,11 @@ class Repository @Inject constructor(
     }
 
     fun sendGeoAndPosition(newGeo: Geo, newPosition: Position) {
-        val positionGeoJoin = PositionGeoJoin(newPosition.id,newGeo.id, newGeo.date)
+        val positionGeoJoin = PositionGeoJoin(newPosition.id, newGeo.id, newGeo.date)
 
         geoDao.insertGeo(newGeo)
-            .zipWith(positionDao.insertPosition(newPosition)){
-                geoResponse, positionRespone -> Log.d("inserResponse", "geoResponse = $geoResponse and positionResponse = $positionRespone ")
+            .zipWith(positionDao.insertPosition(newPosition)) { geoResponse, positionRespone ->
+                Log.d("inserResponse", "geoResponse = $geoResponse and positionResponse = $positionRespone ")
             }
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
@@ -161,7 +135,7 @@ class Repository @Inject constructor(
         )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onError ={
+                onError = {
                     Log.d("sendGeoAndPositionTag", "onError: $it")
                     sharedPreferencesRepository.putPositionID(newGeo.id)
                     sharedPreferencesRepository.putPositionID(newPosition.id)
@@ -176,7 +150,6 @@ class Repository @Inject constructor(
                     assignGeoToPositionOnServer(positionGeoJoin)
                 }
             )
-
     }
 
     private fun getDatabaseInfo() {
@@ -211,6 +184,5 @@ class Repository @Inject constructor(
                 onSuccess = { Log.d("getAllAssigns", "Success! List of assigns: ${it.map { return@map "$it\n" }}") }
             )
     }
-
 }
 
